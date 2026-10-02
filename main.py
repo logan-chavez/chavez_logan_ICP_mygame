@@ -31,13 +31,13 @@ class Game:
         self.running = True
         self.playing = True
         self.clock = pg.time.Clock()
-    
+    # adds images, audio, and map
     def load_data(self, map):
         self.game_dir = path.dirname(__file__)
         self.image_dir = path.join(self.game_dir, 'images')
         self.snd_dir = path.join(self.game_dir, 'audio')
         self.map = Map(path.join(self.game_dir, map))
-    # adds images, audio, and map
+    
     def new(self):
         self.load_data('level1.txt')
         self.all_sprites = pg.sprite.Group()
@@ -46,8 +46,8 @@ class Game:
   
         # self.wall = Wall(self, 10, 10)
         self.mob = Mob(self, 5, 0)
-    # adds all sprites
 
+        # adds all sprites into the game
         for row, tiles in enumerate(self.map.data):
             for col, tile, in enumerate(tiles):
                 if tile == "1":
@@ -75,7 +75,7 @@ class Game:
                 if self.playing:
                     self.playing = False
                 self.running = False
-
+    # updates all the sprites
     def update(self):
         self.all_sprites.update()
     # creates an output for the screen color
@@ -83,6 +83,7 @@ class Game:
         self.screen.fill(BGCOLOR)
         self.all_sprites.draw(self.screen)
         pg.display.flip()
+# if the file is named main you run the game
 if __name__ == "__main__":
     g = Game()
 

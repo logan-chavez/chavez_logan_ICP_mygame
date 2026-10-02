@@ -1,6 +1,7 @@
 import pygame as pg
 from settings import *
 from math import floor
+from images import *
  
 class Map:
     def __init__(self, filename):
@@ -10,14 +11,15 @@ class Map:
                 self.data.append(line.strip())
         self.tilewidth=len(self.data[0])
         self.tileheight=len(self.data)
+        # makes the map the same size as the screen
         self.width=self.tilewidth * TILESIZE
         self.height=self.tileheight*TILESIZE
         print('map instantiated')
-
+# adds spritesheet 
 class Spritesheet:
     def __init__(self, filename):
         self.spritesheet = pg.image.load(filename).convert()
-
+    # returns image after scaled
     def get_image(self, x, y, width, height):
         image = pg.Surface((width, height))
         image.blit(self.spritesheet, (0,0), (x,y, width, height))
