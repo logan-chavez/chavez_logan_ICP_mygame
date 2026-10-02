@@ -165,6 +165,8 @@ class Mob(Sprite):
         # makes the mobs blue
         self.image.fill(BLUE)
         self.rect = self.image.get_rect()
+        self.spritesheet = Spritesheet(path.join(self.game.image_dir, "sprite_sheet.png"))
+        self.load_images()
         # sets speed
         self.speed = 20
         self.vx, self.vy = 5,0
@@ -175,9 +177,34 @@ class Mob(Sprite):
         print("mob initialized")
         print(self.rect.x)
         print(self.rect.y)
+        self.last_update = 0
+        self.current_frame = 0
+
+    # animates the mob
+    def animate(self):
+        # use the time element to get now
+        now = pg.time.get_ticks()
+        # updates the player every 350 miliseconds
+        if now - self.last_update > 350:
+            self.last_update = now
+            self.current_frame = (self.current_frame + 1) % len(self.idle_frames)
+            bottom = self.rect.bottom
+            self.image = self.idle_frames[self.current_frame]
+            self.rect = self.image.get_rect()
+            self.rect.bottom = bottom
+    # loads the image into the mob
+    def load_images(self):
+        self.idle_frames = [self.spritesheet.get_image(0,TILESIZE,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE,TILESIZE,TILESIZE, TILESIZE)
+                            ]
+        self.jump_frames = [self.spritesheet.get_image(0,TILESIZE,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE,TILESIZE,TILESIZE, TILESIZE)
+                            ]
+
 
     def update(self):
         # thanks pygame
+        self.animate()
         if self.rect.right > WIDTH or self.rect.left < 0:
               self.speed *= -1
               self.y += TILESIZE
