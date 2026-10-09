@@ -17,7 +17,16 @@ Process: cursor position, position of the player, score, enemy position,
 velocity, aim in FPS, 
 
 Output: things are drawn, sounds: jump, power up, walking, haptics
+
+GOALS: make money, own cars, commit crimes
+
+RULES: can't fly, can't shoot through walls, can't leave map
+
+FEEDBACK: when taking damage screen turns red, recoil, money counter
+
+FREEDOM: walks wherever
 '''
+
 
 
 class Game:
