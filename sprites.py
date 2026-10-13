@@ -65,6 +65,7 @@ class Player(Sprite):
         self.pos = vec(x*TILESIZE,y*TILESIZE)
         self.last_update = 0
         self.current_frame = 0
+        self.coins = 0
         # self.vx, self.vy = 0,0
         # self.x = x*TILESIZE
         # self.y = y*TILESIZE
@@ -127,6 +128,9 @@ class Player(Sprite):
         self.hit_rect.centery = self.pos.y
         collide_with_walls(self, self.game.all_walls, 'y')
         self.rect.center = self.hit_rect.center
+        hits = pg.sprite.spritecollide(self, self.game.all_coins, True,)
+        if hits:
+            self.coins += 1
 
             
 
@@ -150,6 +154,28 @@ class Wall(Sprite):
         # print(self.rect.x)
         # print(self.rect.y)
 
+
+
+class Coin(Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.all_coins
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        pg.draw.circle(self.image)
+        # makes the walls red
+        self.image.fill(RED)
+        self.rect = self.image.get_rect()
+        self.vx, self.vy = 0,0
+        self.x = x*TILESIZE
+        self.y = y*TILESIZE
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+    def update():
+        pass
+
+
     def update(self):
         pass
         # wallhits = pg.sprite.spritecollide(self, self.game.all_walls, True)
@@ -167,9 +193,11 @@ class Mob(Sprite):
         self.rect = self.image.get_rect()
         self.spritesheet = Spritesheet(path.join(self.game.image_dir, "sprite_sheet.png"))
         self.load_images()
+        self.image = self.spritesheet.get_image(0, 0, TILESIZE, TILESIZE)
         # sets speed
-        self.speed = 20
-        self.vx, self.vy = 5,0
+        self.speed = 100
+        self.vel = vec(0,0)
+        self.pos = vec(x*TILESIZE,y*TILESIZE)
         self.x = x*TILESIZE
         self.y = y*TILESIZE
         self.rect.x = self.x
@@ -183,6 +211,7 @@ class Mob(Sprite):
         print(self.rect.y)
         self.last_update = 0
         self.current_frame = 0
+
 
     # animates the mob
     def animate(self):
@@ -206,7 +235,7 @@ class Mob(Sprite):
         ]
 
 
-
+    # uses autocomplete by creating a chase method using pos vectors and obj as a parameter
     def chase(self, obj):
         if self.pos.x < obj.pos.x:
             self.vel.x = self.speed
@@ -229,12 +258,10 @@ class Mob(Sprite):
     def update(self):
         # thanks pygame
         self.animate()
-        if self.game.player:
-            self.chase(self.game.player)
+        self.chase(self.game.player)
         if self.rect.right > WIDTH or self.rect.left < 0:
               self.speed *= -1
               self.y += TILESIZE
-        self.animate()
         # makes the collision with walls work
         self.rect.center = self.pos
         self.pos += self.vel * self.game.dt
@@ -246,10 +273,10 @@ class Mob(Sprite):
         
             
         # sets the speed
-        self.x += self.vx * self.game.dt * self.speed
-        self.rect.x = self.x
-        self.y += self.vy * self.game.dt * self.speed
-        self.rect.y = self.y
+        # self.x += self.vx * self.game.dt * self.speed
+        # self.rect.x = self.x
+        # self.y += self.vy * self.game.dt * self.speed
+        # self.rect.y = self.y
 
 
         

@@ -51,24 +51,26 @@ class Game:
         self.load_data('level1.txt')
         self.all_sprites = pg.sprite.Group()
         self.all_walls = pg.sprite.Group()
+        self.all_coins = pg.sprite.Group()
         self.all_mobs = pg.sprite.Group()
   
         # self.wall = Wall(self, 10, 10)
         self.mob = Mob(self, 5, 0)
+        
 
         # adds all sprites into the game
         for row, tiles in enumerate(self.map.data):
             for col, tile, in enumerate(tiles):
                 if tile == "1":
                     Wall(self, col, row)
-                if tile == "P":
-                    Player(self, col, row)
+                if tile == "c":
+                    Coin(self, col, row)
                 if tile == "M":
                     Mob(self, col, row)
-        # for row, tiles in enumerate(self.map.data):
-        #             for col, tile, in enumerate(tiles):
-        #                 if tile == "P":
-        #                    Wall(self, col, row)
+        for row, tiles in enumerate(self.map.data):
+                    for col, tile, in enumerate(tiles):
+                        if tile == "P":
+                           self.player = Player(self, col, row)
     # runs the game
     def run(self):
         self.playing = True
