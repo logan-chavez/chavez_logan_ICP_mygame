@@ -129,8 +129,10 @@ class Player(Sprite):
         collide_with_walls(self, self.game.all_walls, 'y')
         self.rect.center = self.hit_rect.center
         hits = pg.sprite.spritecollide(self, self.game.all_coins, True,)
+        # updates game when picks up a coin
         if hits:
             self.coins += 1
+            self.game.pickup_snd.play()
 
             
 
@@ -155,25 +157,22 @@ class Wall(Sprite):
         # print(self.rect.y)
 
 
-
+# adds a coin sprite
 class Coin(Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.all_coins
         Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
-        pg.draw.circle(self.image)
-        # makes the walls red
-        self.image.fill(RED)
+        pg.draw.circle(self.image, (YELLOW), (16, 16), 16)
         self.rect = self.image.get_rect()
-        self.vx, self.vy = 0,0
+        self.image.set_colorkey(BLACK)
         self.x = x*TILESIZE
         self.y = y*TILESIZE
         self.rect.x = self.x
         self.rect.y = self.y
 
-    def update():
-        pass
+
 
 
     def update(self):

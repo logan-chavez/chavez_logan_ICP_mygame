@@ -44,7 +44,9 @@ class Game:
     def load_data(self, map):
         self.game_dir = path.dirname(__file__)
         self.image_dir = path.join(self.game_dir, 'images')
+        # sound handling
         self.snd_dir = path.join(self.game_dir, 'audio')
+        self.pickup_snd = pg.mixer.Sound(path.join(self.snd_dir, "bell.wav"))
         self.map = Map(path.join(self.game_dir, map))
     
     def new(self):
@@ -63,7 +65,7 @@ class Game:
             for col, tile, in enumerate(tiles):
                 if tile == "1":
                     Wall(self, col, row)
-                if tile == "c":
+                if tile == "C":
                     Coin(self, col, row)
                 if tile == "M":
                     Mob(self, col, row)
@@ -71,6 +73,8 @@ class Game:
                     for col, tile, in enumerate(tiles):
                         if tile == "P":
                            self.player = Player(self, col, row)
+        pg.mixer.music.load(path.join(self.snd_dir, "awesomeness.wav"))
+        pg.mixer.music.play(loops=-1)
     # runs the game
     def run(self):
         self.playing = True
@@ -102,8 +106,11 @@ class Game:
         # order matters because the first things are on the bottom because they are the 'first' to be drawn
         self.screen.fill(BGCOLOR)
         self.all_sprites.draw(self.screen)
+        # adds the text to screen
         self.draw_text("Frames per second: " + str(floor(1/self.dt) ), 24, WHITE, WIDTH/2, HEIGHT/4)
+        self.draw_text("Coins: " + str(floor(self.player.coins) ), 24, WHITE, WIDTH/2, HEIGHT/7)
         pg.display.flip()
+
 # if the file is named main you run the game
 if __name__ == "__main__":
     g = Game()
