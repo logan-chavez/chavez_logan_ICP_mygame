@@ -119,6 +119,12 @@ class Player(Sprite):
     # makes it so the player keeps updating
     def update(self):
         self.get_keys()
+        hits = pg.sprite.spritecollide(self, self.game.all_coins, True,)               
+        # updates game when picks up a coin
+        if hits:
+            self.coins += 1
+            self.game.pickup_snd.play()
+            self.game.score += 1
         self.animate()
         # makes the collision with walls work
         self.rect.center = self.pos
@@ -128,11 +134,7 @@ class Player(Sprite):
         self.hit_rect.centery = self.pos.y
         collide_with_walls(self, self.game.all_walls, 'y')
         self.rect.center = self.hit_rect.center
-        hits = pg.sprite.spritecollide(self, self.game.all_coins, True,)
-        # updates game when picks up a coin
-        if hits:
-            self.coins += 1
-            self.game.pickup_snd.play()
+        
 
             
 
