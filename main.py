@@ -75,6 +75,7 @@ class Game:
         self.all_walls = pg.sprite.Group()
         self.all_coins = pg.sprite.Group()
         self.all_mobs = pg.sprite.Group()
+        self.all_particles = pg.sprite.Group()
   
         # self.wall = Wall(self, 10, 10)
         self.mob = Mob(self, 5, 0)
@@ -106,13 +107,16 @@ class Game:
     # lets you close the tab when game ends
     def events(self):
         for event in pg.event.get():
+            # joins and reads the highscore file
             if event.type == pg.QUIT:
+                # keeps the highest score
                 if self.score > self.high_score:
                     with open(path.join(self.game_dir, self.game_save_file), 'w') as file:
                         file.write(str(self.score))
                 if self.playing:
                     self.playing = False
                 self.running = False
+    # adds text
     def draw_text(self, text, size, color, x, y):
         font_name = pg.font.match_font('arial')
         font = pg.font.Font(font_name, size)

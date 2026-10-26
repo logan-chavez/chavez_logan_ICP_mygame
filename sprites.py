@@ -7,7 +7,7 @@ from pygame.sprite import Sprite
 from utils import *
 
 from os import path
-
+from random import randint
 vec = pg.math.Vector2
 
 # It tells you when two objects collide
@@ -122,6 +122,8 @@ class Player(Sprite):
         hits = pg.sprite.spritecollide(self, self.game.all_coins, True,)               
         # updates game when picks up a coin
         if hits:
+            for i in range(10):
+                Particle(self.game, hits[0].rect.x, hits[0].rect.y)
             self.coins += 1
             self.game.pickup_snd.play()
             self.game.score += 1
@@ -157,6 +159,38 @@ class Wall(Sprite):
         # print("wall initialized")
         # print(self.rect.x)
         # print(self.rect.y)
+# adds a particle class
+class Particle(Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.all_particles
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE/8, TILESIZE/8))
+        # makes the particles white
+        self.image.fill(WHITE)
+        self.rect = self.image.get_rect()
+        # sets position and speed
+        self.vx, self.vy = 0,0
+        self.x = x
+        self.y = y
+        self.speed = 25
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.countdown = Cooldown(5000)
+        self.countdown.event_time = floor(pg.time.get_ticks()/1000)
+        # print("wall initialized")
+        print(self.rect.x)
+        print(self.rect.y)
+        print(str(len(self.game.all_particles)))
+    def update(self):
+        # adds a kill countdown for particles
+        self.countdown.ticking()
+        self.rect.x += self.speed*randint(-5,5)
+        self.rect.y += self.speed*randint(-5,5)
+        if self.countdown.delta > 2:
+            self.kill
+
+    
 
 
 # adds a coin sprite
