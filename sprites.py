@@ -6,7 +6,6 @@ from settings import *
 from pygame.sprite import Sprite
 from utils import *
 
-
 from os import path
 from random import randint
 vec = pg.math.Vector2
@@ -123,7 +122,7 @@ class Player(Sprite):
         hits = pg.sprite.spritecollide(self, self.game.all_coins, True,)               
         # updates game when picks up a coin
         if hits:
-            for i in range(100):
+            for i in range(10):
                 Particle(self.game, hits[0].rect.x, hits[0].rect.y)
             self.coins += 1
             self.game.pickup_snd.play()
@@ -171,30 +170,25 @@ class Particle(Sprite):
         self.image.fill(WHITE)
         self.rect = self.image.get_rect()
         # sets position and speed
-        self.vel = vec(randint(-180,180),randint(-180,180))
-        self.pos = vec(x,y)
-        self.speed = randint(1,3)
-        self.countdown = Cooldown()
-        self.countdown.event_time = floor(pg.time.get_ticks()/100)
-        
+        self.vx, self.vy = 0,0
+        self.x = x
+        self.y = y
+        self.speed = 25
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.countdown = Cooldown(5000)
+        self.countdown.event_time = floor(pg.time.get_ticks()/1000)
         # print("wall initialized")
-        print(self.pos.x)
-        print(self.pos.y)
+        print(self.rect.x)
+        print(self.rect.y)
         print(str(len(self.game.all_particles)))
     def update(self):
         # adds a kill countdown for particles
         self.countdown.ticking()
-
-        self.pos += self.vel * self.speed * self.game.dt
-        # uses countdown to kill particles after 2 seconds
+        self.rect.x += self.speed*randint(-5,5)
+        self.rect.y += self.speed*randint(-5,5)
         if self.countdown.delta > 2:
-            self.kill()
-            print("im dead")
-
-        print(self.countdown.delta)        
-        self.rect.x = self.pos.x
-        self.rect.y = self.pos.y
-
+            self.kill
 
     
 
