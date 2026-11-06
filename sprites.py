@@ -66,6 +66,8 @@ class Player(Sprite):
         self.last_update = 0
         self.current_frame = 0
         self.coins = 0
+        self.cofric = -0.1
+        self.jumping = False
         # self.vx, self.vy = 0,0
         # self.x = x*TILESIZE
         # self.y = y*TILESIZE
@@ -81,21 +83,39 @@ class Player(Sprite):
         keys = pg.key.get_pressed()
         # makes the player move through user input
         if keys[pg.K_LEFT] or keys[pg.K_a]:
-            self.vel.x = -PLAYER_SPEED
+            self.vel.x = PLAYER_SPEED
             # self.vx = -PLAYER_SPEED
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
-                    self.vel.x = PLAYER_SPEED
+                    self.vel.x = -PLAYER_SPEED
                     # self.vx = PLAYER_SPEED
         if keys[pg.K_UP] or keys[pg.K_w]:
-                    self.vel.y = -PLAYER_SPEED
+                    self.vel.y = PLAYER_SPEED
                     # self.vy = -PLAYER_SPEED
         if keys[pg.K_DOWN] or keys[pg.K_s]:
-                    self.vel.y = PLAYER_SPEED
+                    self.vel.y = -PLAYER_SPEED
+        if keys[pg.K_SPACE]:
+            self.jump()
                     # self.vy = PLAYER_SPEED
                 # check to see if player si moving diagonal
         # makes you move diagonal the same speed
         if self.vel.x != 0 and self.vel.y != 0:
             self.vel *= 0.7071
+    # adding a jump mechanic to the game
+    def jump(self):
+            # jump only if standing on a platform
+            self.rect.y += 2
+            hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
+            self.rect.y -= 2
+            if hits and not self.jumping:
+                self.game.jump_sound.play()
+                self.jumping = True
+                self.vel.y = -PLAYER_JUMP
+    # tells us if we are jumping
+    def is_jumping(self):
+        if self.vel.y > 0:
+            hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
+            if hits:
+                self.jumping = False
 
     def animate(self):
         # use the time element to get now
@@ -118,6 +138,8 @@ class Player(Sprite):
 
     # makes it so the player keeps updating
     def update(self):
+        self.acc = vec(0,0.8)
+        self.is_jumping()
         self.get_keys()
         hits = pg.sprite.spritecollide(self, self.game.all_coins, True,)               
         # updates game when picks up a coin
@@ -128,14 +150,18 @@ class Player(Sprite):
             self.game.pickup_snd.play()
             self.game.score += 1
         self.animate()
+        self.acc.x += self.vel.x * self.cofric
+        self.acc.y += self.vel.y * self.cofric
+        self.vel += self.acc
         # makes the collision with walls work
         self.rect.center = self.pos
-        self.pos += self.vel * self.game.dt
+        self.pos += self.vel * self.game.dt + 0.5 * self.acc
         self.hit_rect.centerx = self.pos.x
         collide_with_walls(self, self.game.all_walls, 'x')
         self.hit_rect.centery = self.pos.y
-        collide_with_walls(self, self.game.all_walls, 'y')
-        self.rect.center = self.hit_rect.center
+        if collide_with_walls(self, self.game.all_walls, 'y'):
+            self.jumping = False
+        # self.rect.center = self.hit_rect.center
         
 
             

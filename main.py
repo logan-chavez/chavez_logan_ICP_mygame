@@ -18,13 +18,13 @@ velocity, aim in FPS,
 
 Output: things are drawn, sounds: jump, power up, walking, haptics
 
-GOALS: make money, own cars, commit crimes
+GOALS: to collect objects
 
-RULES: can't fly, can't shoot through walls, can't leave map
+RULES: have to stay within the map
 
-FEEDBACK: when taking damage screen turns red, recoil, money counter
+FEEDBACK: sound effect when you collect objects
 
-FREEDOM: walks wherever
+FREEDOM: can move around (as long as your in the map)
 '''
 
 
@@ -54,6 +54,7 @@ class Game:
         # sound handling
         self.snd_dir = path.join(self.game_dir, 'audio')
         self.pickup_snd = pg.mixer.Sound(path.join(self.snd_dir, "bell.wav"))
+        self.jump_sound = pg.mixer.Sound(path.join(self.snd_dir, 'Jump33.ogg'))
         self.map = Map(path.join(self.game_dir, map))
 
         try:
