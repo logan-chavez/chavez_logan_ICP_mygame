@@ -26,20 +26,10 @@ class Spritesheet:
         new_image = pg.transform.scale(image, (width, height))
         image = new_image
         return image
-# adds a cooldown 
-class Cooldown:
-    def __init__(self, time):
-        self.start_time = 0
-        self.time = time
-        self.current_time = self.time
-    def ticking(self):
-        self.current_time = floor((pg.time.get_ticks())/1000)
-        self.delta = self.current_time = self.event_time
-    def start(self):
-        self.start_time = pg.time.get_ticks()
-    def ready(self):
-        self.current_time = pg.time.get_ticks()
-
-        if self.current_time - self.start_time >= self.time:
-            return True
-        return False
+# adds a timer to the particles
+class Timer:
+    def __init__(self):
+        self.event_time = floor((pg.time.get_ticks())/1000)
+    def get_delta(self):
+        # returns difference in time in seconds from time of instantiation to now
+        return floor((pg.time.get_ticks())/1000) - self.event_time

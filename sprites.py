@@ -106,7 +106,7 @@ class Player(Sprite):
             self.rect.y += 2
             hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
             self.rect.y -= 2
-            if hits and not self.jumping:
+            if hits and not self.jumping: #checks to see if player is on the ground and not already jumping
                 self.game.jump_sound.play()
                 self.jumping = True
                 self.vel.y = -PLAYER_JUMP
@@ -144,8 +144,8 @@ class Player(Sprite):
         hits = pg.sprite.spritecollide(self, self.game.all_coins, True,)               
         # updates game when picks up a coin
         if hits:
-            for i in range(10):
-                Particle(self.game, hits[0].rect.x, hits[0].rect.y)
+            # for i in range(10):
+                # Particle(self.game, hits[0].rect.x, hits[0].rect.y)
             self.coins += 1
             self.game.pickup_snd.play()
             self.game.score += 1
@@ -186,40 +186,40 @@ class Wall(Sprite):
         # print(self.rect.x)
         # print(self.rect.y)
 # adds a particle class
-class Particle(Sprite):
-    def __init__(self, game, x, y):
-        self.groups = game.all_sprites, game.all_particles
-        Sprite.__init__(self, self.groups)
-        self.game = game
-        self.image = pg.Surface((TILESIZE/8, TILESIZE/8))
-        # makes the particles white
-        self.image.fill(WHITE)
-        self.rect = self.image.get_rect()
-        # sets position and speed
-        self.vx, self.vy = 0,0
-        self.x = x
-        self.y = y
-        self.speed = 25
-        self.rect.x = self.x
-        self.rect.y = self.y
-        self.countdown = Cooldown(5000)
-        self.countdown.event_time = floor(pg.time.get_ticks()/1000)
-        # print("wall initialized")
-        print(self.rect.x)
-        print(self.rect.y)
-        print(str(len(self.game.all_particles)))
-    def update(self):
-        # adds a kill countdown for particles
-        self.countdown.ticking()
-        self.rect.x += self.speed*randint(-5,5)
-        self.rect.y += self.speed*randint(-5,5)
-        if self.countdown.delta > 2:
-            self.kill
+# class Particle(Sprite):
+#     def __init__(self, game, x, y):
+#         self.groups = game.all_sprites, game.all_particles
+#         Sprite.__init__(self, self.groups)
+#         self.game = game
+#         self.image = pg.Surface((TILESIZE/8, TILESIZE/8))
+#         # makes the particles white
+#         self.image.fill(WHITE)
+#         self.rect = self.image.get_rect()
+#         # sets position and speed
+#         self.vx, self.vy = 0,0
+#         self.x = x
+#         self.y = y
+#         self.speed = 25
+#         self.rect.x = self.x
+#         self.rect.y = self.y
+#         self.countdown = Timer()
+#         self.countdown.event_time = floor(pg.time.get_ticks()/1000)
+#         # print("wall initialized")
+#         print(self.rect.x)
+#         print(self.rect.y)
+#         print(str(len(self.game.all_particles)))
+#     def update(self):
+#         # adds a kill countdown for particles
+
+#         self.rect.x += self.speed*randint(-5,5)
+#         self.rect.y += self.speed*randint(-5,5)
+#         if self.get_delta() > 2:
+#             self.kill
 
     
 
 
-# adds a coin sprite
+# # adds a coin sprite
 class Coin(Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.all_coins
