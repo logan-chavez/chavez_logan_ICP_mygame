@@ -42,7 +42,18 @@ def collide_with_walls(sprite, group, dir):
                 sprite.pos.y = hits[0].rect.bottom + sprite.hit_rect.width / 2
             sprite.vel.y = 0
             sprite.hit_rect.centery = sprite.pos.y
-        
+
+def collide_with_mobs(sprite, group, dir):
+    if dir == 'x':
+        hits = pg.sprite.spritecollide(sprite, group, False, collide_hit_rect)
+        if hits:
+            print("I am colliding with mobs")
+            sprite.kill()
+    if dir == 'y':
+        hits = pg.sprite.spritecollide(sprite, group, False, collide_hit_rect)
+        if hits:
+            print("I am colliding with mobs")
+            sprite.kill()
 
 # adds a new class
 class Player(Sprite):
@@ -67,7 +78,7 @@ class Player(Sprite):
         self.current_frame = 0
         self.coins = 0
         self.cofric = -0.1
-        self.jumping = False
+        # self.jumping = False
         # self.vx, self.vy = 0,0
         # self.x = x*TILESIZE
         # self.y = y*TILESIZE
@@ -93,29 +104,29 @@ class Player(Sprite):
                     # self.vy = -PLAYER_SPEED
         if keys[pg.K_DOWN] or keys[pg.K_s]:
                     self.vel.y = -PLAYER_SPEED
-        if keys[pg.K_SPACE]:
-            self.jump()
+        # if keys[pg.K_SPACE]:
+        #     self.jump()
                     # self.vy = PLAYER_SPEED
                 # check to see if player si moving diagonal
         # makes you move diagonal the same speed
         if self.vel.x != 0 and self.vel.y != 0:
             self.vel *= 0.7071
     # adding a jump mechanic to the game
-    def jump(self):
-            # jump only if standing on a platform
-            self.rect.y += 2
-            hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
-            self.rect.y -= 2
-            if hits and not self.jumping: #checks to see if player is on the ground and not already jumping
-                self.game.jump_sound.play()
-                self.jumping = True
-                self.vel.y = -PLAYER_JUMP
-    # tells us if we are jumping
-    def is_jumping(self):
-        if self.vel.y > 0:
-            hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
-            if hits:
-                self.jumping = False
+    # def jump(self):
+    #         # jump only if standing on a platform
+    #         self.rect.y = 0
+    #         hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
+    #         self.rect.y -= 2
+    #         if hits and not self.jumping: #checks to see if player is on the ground and not already jumping
+    #             self.game.jump_sound.play()
+    #             self.jumping = True
+    #             self.vel.y = -PLAYER_JUMP
+    # # tells us if we are jumping
+    # def is_jumping(self):
+    #     if self.vel.y > 0:
+    #         hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
+    #         if hits:
+    #             self.jumping = False
 
     def animate(self):
         # use the time element to get now
@@ -132,14 +143,14 @@ class Player(Sprite):
         self.idle_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE),
                             self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE)
                             ]
-        self.jump_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE),
-                            self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE)
-                            ]
+        # self.jump_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE),
+        #                     self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE)
+                            
 
     # makes it so the player keeps updating
     def update(self):
         self.acc = vec(0,0.8)
-        self.is_jumping()
+        # self.is_jumping()
         self.get_keys()
         hits = pg.sprite.spritecollide(self, self.game.all_coins, True,)               
         # updates game when picks up a coin
@@ -159,8 +170,10 @@ class Player(Sprite):
         self.hit_rect.centerx = self.pos.x
         collide_with_walls(self, self.game.all_walls, 'x')
         self.hit_rect.centery = self.pos.y
-        if collide_with_walls(self, self.game.all_walls, 'y'):
-            self.jumping = False
+        collide_with_mobs(self, self.game.all_mobs, 'x')
+        collide_with_mobs(self, self.game.all_mobs, 'y')
+        collide_with_walls(self, self.game.all_walls, 'y')
+        #     self.jumping = False
         # self.rect.center = self.hit_rect.center
         
 
@@ -291,9 +304,9 @@ class Mob(Sprite):
         self.idle_frames = [self.spritesheet.get_image(0,TILESIZE,TILESIZE, TILESIZE),
                             self.spritesheet.get_image(TILESIZE,TILESIZE,TILESIZE, TILESIZE)
                             ]
-        self.jump_frames = [self.spritesheet.get_image(0,TILESIZE,TILESIZE, TILESIZE),
-                            self.spritesheet.get_image(TILESIZE,TILESIZE,TILESIZE, TILESIZE)
-        ]
+        # self.jump_frames = [self.spritesheet.get_image(0,TILESIZE,TILESIZE, TILESIZE),
+        #                     self.spritesheet.get_image(TILESIZE,TILESIZE,TILESIZE, TILESIZE)
+        
 
 
     # uses autocomplete by creating a chase method using pos vectors and obj as a parameter
