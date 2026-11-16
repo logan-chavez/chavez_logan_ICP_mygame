@@ -54,7 +54,7 @@ class Game:
         # sound handling
         self.snd_dir = path.join(self.game_dir, 'audio')
         self.pickup_snd = pg.mixer.Sound(path.join(self.snd_dir, "bell.wav"))
-        self.jump_sound = pg.mixer.Sound(path.join(self.snd_dir, 'Jump33.ogg'))
+        # self.jump_sound = pg.mixer.Sound(path.join(self.snd_dir, 'Jump33.ogg'))
         self.map = Map(path.join(self.game_dir, map))
 
         try:
@@ -77,9 +77,10 @@ class Game:
         self.all_coins = pg.sprite.Group()
         self.all_mobs = pg.sprite.Group()
         self.all_particles = pg.sprite.Group()
+        self.all_bullets = pg.sprite.Group()
   
         # self.wall = Wall(self, 10, 10)
-        self.mob = Mob(self, 5, 0)
+
         
 
         # adds all sprites into the game
@@ -117,6 +118,8 @@ class Game:
                 if self.playing:
                     self.playing = False
                 self.running = False
+            
+            
     # adds text
     def draw_text(self, text, size, color, x, y):
         font_name = pg.font.match_font('arial')
@@ -141,6 +144,7 @@ class Game:
         self.draw_text("High Score: " + str(floor(self.high_score) ), 24, WHITE, WIDTH/2, HEIGHT/8)
         pg.display.flip()
 
+        
 # if the file is named main you run the game
 if __name__ == "__main__":
     g = Game()

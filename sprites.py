@@ -15,7 +15,6 @@ def collide_hit_rect(one, two):
     return one.hit_rect.colliderect(two.rect)
 
 def collide_with_walls(sprite, group, dir):
-    # check for x collision
     if dir == 'x':
         # checking if we collided with hitrects
         hits = pg.sprite.spritecollide(sprite, group, False, collide_hit_rect)
@@ -23,10 +22,10 @@ def collide_with_walls(sprite, group, dir):
             # this line checks to see if we're to the left of the wall
             if hits[0].rect.centerx > sprite.hit_rect.centerx:
                 # reposition the player (sprite) to the left side of the wall
-                sprite.pos.x = hits[0].rect.left - sprite.hit_rect.height / 2
+                sprite.pos.x = hits[0].rect.left - sprite.hit_rect.width / 2
             if hits[0].rect.centerx < sprite.hit_rect.centerx:
                 # reposition the player (sprite) to the right side of the wall
-                sprite.pos.x = hits[0].rect.right + sprite.hit_rect.height / 2
+                sprite.pos.x = hits[0].rect.right + sprite.hit_rect.width / 2
             sprite.vel.x = 0
             sprite.hit_rect.centerx = sprite.pos.x
     if dir == 'y':
@@ -36,12 +35,14 @@ def collide_with_walls(sprite, group, dir):
             # this line checks to see if we're to the left of the wall
             if hits[0].rect.centery > sprite.hit_rect.centery:
                 # reposition the player (sprite) to the left side of the wall
-                sprite.pos.y = hits[0].rect.top - sprite.hit_rect.width / 2
+                sprite.pos.y = hits[0].rect.top - sprite.hit_rect.height / 2
             if hits[0].rect.centery < sprite.hit_rect.centery:
                 # reposition the player (sprite) to the right side of the wall
-                sprite.pos.y = hits[0].rect.bottom + sprite.hit_rect.width / 2
+                sprite.pos.y = hits[0].rect.bottom + sprite.hit_rect.height / 2
             sprite.vel.y = 0
             sprite.hit_rect.centery = sprite.pos.y
+
+   
 
 def collide_with_mobs(sprite, group, dir):
     if dir == 'x':
@@ -95,18 +96,23 @@ class Player(Sprite):
         # makes the player move through user input
         if keys[pg.K_LEFT] or keys[pg.K_a]:
             self.vel.x = PLAYER_SPEED
+            self.current_direction = "left"
             # self.vx = -PLAYER_SPEED
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
                     self.vel.x = -PLAYER_SPEED
+                    self.current_direction = "right"
                     # self.vx = PLAYER_SPEED
         if keys[pg.K_UP] or keys[pg.K_w]:
                     self.vel.y = PLAYER_SPEED
+                    self.current_direction = "up"
                     # self.vy = -PLAYER_SPEED
         if keys[pg.K_DOWN] or keys[pg.K_s]:
                     self.vel.y = -PLAYER_SPEED
-        # if keys[pg.K_SPACE]:
-        #     self.jump()
-                    # self.vy = PLAYER_SPEED
+                    self.current_direction = "down"
+        if keys[pg.K_SPACE]:
+            self.bullet()
+            
+        
                 # check to see if player si moving diagonal
         # makes you move diagonal the same speed
         if self.vel.x != 0 and self.vel.y != 0:
@@ -145,13 +151,34 @@ class Player(Sprite):
                             ]
         # self.jump_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE),
         #                     self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE)
-                            
+
+    # finds the current direction of the player
+    def current_direction(self):
+        keys = pg.key.get_pressed()
+        if keys[pg.K_LEFT] or keys[pg.K_a]:
+            self.current_direction = "left"
+        if keys[pg.K_RIGHT] or keys[pg.K_d]:
+                    self.current_direction = "right"
+        if keys[pg.K_UP] or keys[pg.K_w]:
+                    self.current_direction = "up"
+        if keys[pg.K_DOWN] or keys[pg.K_s]:
+                    self.current_direction = "down"
+        
+        
+    def bullet(self):
+        self.current_direction()
+        self.spritesheet = Spritesheet(path.join(self.game.image_dir, "sprite_sheet.png"))
+        self.load_images()
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image = self.spritesheet.get_image(0,0,TILESIZE, TILESIZE)
+
 
     # makes it so the player keeps updating
     def update(self):
-        self.acc = vec(0,0.8)
+        self.acc = vec(0,0)
         # self.is_jumping()
         self.get_keys()
+        print(self.current_direction)
         hits = pg.sprite.spritecollide(self, self.game.all_coins, True,)               
         # updates game when picks up a coin
         if hits:
@@ -168,18 +195,20 @@ class Player(Sprite):
         self.rect.center = self.pos
         self.pos += self.vel * self.game.dt + 0.5 * self.acc
         self.hit_rect.centerx = self.pos.x
-        collide_with_walls(self, self.game.all_walls, 'x')
         self.hit_rect.centery = self.pos.y
-        collide_with_mobs(self, self.game.all_mobs, 'x')
-        collide_with_mobs(self, self.game.all_mobs, 'y')
+        collide_with_walls(self, self.game.all_walls, 'x')
         collide_with_walls(self, self.game.all_walls, 'y')
+        # collide_with_mobs(self, self.game.all_mobs, 'x')
+        # collide_with_mobs(self, self.game.all_mobs, 'y')
+        
         #     self.jumping = False
         # self.rect.center = self.hit_rect.center
         
 
             
 
-       
+    
+
 
 class Wall(Sprite):
     def __init__(self, game, x, y):
@@ -187,9 +216,10 @@ class Wall(Sprite):
         Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
-        # makes the walls red
-        self.image.fill(RED)
         self.rect = self.image.get_rect()
+        self.spritesheet = Spritesheet(path.join(self.game.image_dir, "sprite_sheet.png"))
+        # self.load_images()
+        self.image = self.spritesheet.get_image(0, 2*TILESIZE, TILESIZE, TILESIZE)
         self.vx, self.vy = 0,0
         self.x = x*TILESIZE
         self.y = y*TILESIZE
@@ -249,6 +279,7 @@ class Coin(Sprite):
 
 
 
+    
 
     def update(self):
         pass
