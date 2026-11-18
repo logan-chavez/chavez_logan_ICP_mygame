@@ -19,6 +19,7 @@ def collide_with_walls(sprite, group, dir):
         # checking if we collided with hitrects
         hits = pg.sprite.spritecollide(sprite, group, False, collide_hit_rect)
         if hits:
+            print("colliding with a wall")
             # this line checks to see if we're to the left of the wall
             if hits[0].rect.centerx > sprite.hit_rect.centerx:
                 # reposition the player (sprite) to the left side of the wall
@@ -96,21 +97,17 @@ class Player(Sprite):
         # makes the player move through user input
         if keys[pg.K_LEFT] or keys[pg.K_a]:
             self.vel.x = PLAYER_SPEED
-            self.current_direction = "left"
             # self.vx = -PLAYER_SPEED
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
                     self.vel.x = -PLAYER_SPEED
-                    self.current_direction = "right"
                     # self.vx = PLAYER_SPEED
         if keys[pg.K_UP] or keys[pg.K_w]:
                     self.vel.y = PLAYER_SPEED
-                    self.current_direction = "up"
                     # self.vy = -PLAYER_SPEED
         if keys[pg.K_DOWN] or keys[pg.K_s]:
                     self.vel.y = -PLAYER_SPEED
-                    self.current_direction = "down"
         if keys[pg.K_SPACE]:
-            self.bullet()
+            self.teleport()
             
         
                 # check to see if player si moving diagonal
@@ -154,23 +151,28 @@ class Player(Sprite):
 
     # finds the current direction of the player
     def current_direction(self):
-        keys = pg.key.get_pressed()
-        if keys[pg.K_LEFT] or keys[pg.K_a]:
-            self.current_direction = "left"
-        if keys[pg.K_RIGHT] or keys[pg.K_d]:
-                    self.current_direction = "right"
-        if keys[pg.K_UP] or keys[pg.K_w]:
-                    self.current_direction = "up"
-        if keys[pg.K_DOWN] or keys[pg.K_s]:
-                    self.current_direction = "down"
+        self.direction = "none"
+        if self.vel.x == PLAYER_SPEED:
+            self.direction = "left"
+        elif self.vel.x == -PLAYER_SPEED:
+            self.direction = "right"
+        elif self.vel.y == PLAYER_SPEED:
+            self.direction = "up"
+        elif self.vel.y == -PLAYER_SPEED:
+            self.direction = "down"
         
-        
-    def bullet(self):
+    def teleport(self):
+        if PLAYER_SPEED > 0:
+            self.pos.x += 10
+
+    def fire(self):
         self.current_direction()
-        self.spritesheet = Spritesheet(path.join(self.game.image_dir, "sprite_sheet.png"))
-        self.load_images()
-        self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image = self.spritesheet.get_image(0,0,TILESIZE, TILESIZE)
+        speed_x = 10
+        speed_y = 10
+
+        Bullet(self.game, self.pos.x, self.pos.y, TILESIZE/4, TILESIZE/4, speed_x, speed_y)
+    
+
 
 
     # makes it so the player keeps updating
@@ -178,7 +180,16 @@ class Player(Sprite):
         self.acc = vec(0,0)
         # self.is_jumping()
         self.get_keys()
-        print(self.current_direction)
+        self.current_direction()
+        # if self.vel.x == PLAYER_SPEED:
+        #     self.direction = "left"
+        # elif self.vel.x == -PLAYER_SPEED:
+        #     self.direction = "right"
+        # elif self.vel.y == PLAYER_SPEED:
+        #     self.direction = "up"
+        # elif self.vel.y == -PLAYER_SPEED:
+        #     self.direction = "down"
+        print(self.direction)
         hits = pg.sprite.spritecollide(self, self.game.all_coins, True,)               
         # updates game when picks up a coin
         if hits:
@@ -195,9 +206,10 @@ class Player(Sprite):
         self.rect.center = self.pos
         self.pos += self.vel * self.game.dt + 0.5 * self.acc
         self.hit_rect.centerx = self.pos.x
-        self.hit_rect.centery = self.pos.y
         collide_with_walls(self, self.game.all_walls, 'x')
+        self.hit_rect.centery = self.pos.y
         collide_with_walls(self, self.game.all_walls, 'y')
+        self.rect.center = self.hit_rect.center
         # collide_with_mobs(self, self.game.all_mobs, 'x')
         # collide_with_mobs(self, self.game.all_mobs, 'y')
         
@@ -205,7 +217,28 @@ class Player(Sprite):
         # self.rect.center = self.hit_rect.center
         
 
-            
+class Bullet(Sprite):   
+    def __init__(self, game, x, y, w, h, sx, sy):
+        self.groups = game.all_sprites, game.all_bullets
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((w,h))    
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.radius = TILESIZE/4
+        pg.draw.circle(self.image, YELLOW, self.rect.center, self.radius)
+        self.rect.x = x
+        self.rect.y = y
+        self.vel_x = sx
+        self.vel_y = sy
+        self.fired = False
+        def update(self):
+            self.rect.x += self.vel_x
+            self.rect.y += self.vel_y
+            if self.rect.y < 0 or self.rect.y > HEIGHT:
+                self.kill()
+            if self.rect.x < 0 or self.rect.x > WIDTH:
+                self.kill()
 
     
 
